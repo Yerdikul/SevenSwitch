@@ -41,7 +41,7 @@ import QuartzCore
             self.setOn(newValue, animated: false)
         }
     }
-
+    
     /*
     *	Sets the background color that shows when the switch off and actively being touched.
     *   Defaults to light gray.
@@ -188,6 +188,10 @@ import QuartzCore
     */
     public var offLabel: UILabel!
     
+    public var onLabelOffsetX: CGFloat = 0
+    
+    public var offLabelOffsetX: CGFloat = 0
+    
     // internal
     internal var backgroundView: UIView!
     internal var thumbView: UIView!
@@ -250,13 +254,13 @@ import QuartzCore
         backgroundView.addSubview(offImageView)
         
         // labels
-        self.onLabel = UILabel(frame: CGRectMake(0, 0, self.frame.size.width - self.frame.size.height, self.frame.size.height))
+        self.onLabel = UILabel(frame: CGRectMake(onLabelOffsetX, 0, self.frame.size.width - self.frame.size.height, self.frame.size.height))
         onLabel.textAlignment = NSTextAlignment.Center
         onLabel.textColor = UIColor.lightGrayColor()
         onLabel.font = UIFont.systemFontOfSize(12)
         backgroundView.addSubview(onLabel)
         
-        self.offLabel = UILabel(frame: CGRectMake(self.frame.size.height, 0, self.frame.size.width - self.frame.size.height, self.frame.size.height))
+        self.offLabel = UILabel(frame: CGRectMake(self.frame.size.height + offLabelOffsetX, 0, self.frame.size.width - self.frame.size.height, self.frame.size.height))
         offLabel.textAlignment = NSTextAlignment.Center
         offLabel.textColor = UIColor.lightGrayColor()
         offLabel.font = UIFont.systemFontOfSize(12)
@@ -280,7 +284,7 @@ import QuartzCore
         thumbImageView.contentMode = UIViewContentMode.Center
         thumbImageView.autoresizingMask = UIViewAutoresizing.FlexibleWidth
         thumbView.addSubview(thumbImageView)
-    
+        
         self.on = false
     }
     
@@ -294,16 +298,16 @@ import QuartzCore
         isAnimating = true
         
         UIView.animateWithDuration(0.3, delay: 0.0, options: [UIViewAnimationOptions.CurveEaseOut, UIViewAnimationOptions.BeginFromCurrentState], animations: {
-                if self.on {
-                    self.thumbView.frame = CGRectMake(self.bounds.size.width - (activeKnobWidth + 1), self.thumbView.frame.origin.y, activeKnobWidth, self.thumbView.frame.size.height)
-                    self.backgroundView.backgroundColor = self.onTintColor
-                    self.thumbView.backgroundColor = self.onThumbTintColor
-                }
-                else {
-                    self.thumbView.frame = CGRectMake(self.thumbView.frame.origin.x, self.thumbView.frame.origin.y, activeKnobWidth, self.thumbView.frame.size.height)
-                    self.backgroundView.backgroundColor = self.activeColor
-                    self.thumbView.backgroundColor = self.thumbTintColor
-                }
+            if self.on {
+                self.thumbView.frame = CGRectMake(self.bounds.size.width - (activeKnobWidth + 1), self.thumbView.frame.origin.y, activeKnobWidth, self.thumbView.frame.size.height)
+                self.backgroundView.backgroundColor = self.onTintColor
+                self.thumbView.backgroundColor = self.onThumbTintColor
+            }
+            else {
+                self.thumbView.frame = CGRectMake(self.thumbView.frame.origin.x, self.thumbView.frame.origin.y, activeKnobWidth, self.thumbView.frame.size.height)
+                self.backgroundView.backgroundColor = self.activeColor
+                self.thumbView.backgroundColor = self.thumbTintColor
+            }
             }, completion: { finished in
                 self.isAnimating = false
         })
@@ -331,15 +335,15 @@ import QuartzCore
                 didChangeWhileTracking = true
             }
         }
-
+        
         return true
     }
     
     override public func endTrackingWithTouch(touch: UITouch?, withEvent event: UIEvent?) {
         super.endTrackingWithTouch(touch, withEvent: event)
-
+        
         let previousValue = self.on
-
+        
         if didChangeWhileTracking {
             self.setOn(currentVisualValue, animated: true)
         }
@@ -377,8 +381,8 @@ import QuartzCore
             // images
             onImageView.frame = CGRectMake(0, 0, frame.size.width - frame.size.height, frame.size.height)
             offImageView.frame = CGRectMake(frame.size.height, 0, frame.size.width - frame.size.height, frame.size.height)
-            self.onLabel.frame = CGRectMake(0, 0, frame.size.width - frame.size.height, frame.size.height)
-            self.offLabel.frame = CGRectMake(frame.size.height, 0, frame.size.width - frame.size.height, frame.size.height)
+            self.onLabel.frame = CGRectMake(onLabelOffsetX, 0, frame.size.width - frame.size.height, frame.size.height)
+            self.offLabel.frame = CGRectMake(frame.size.height + offLabelOffsetX, 0, frame.size.width - frame.size.height, frame.size.height)
             
             // thumb
             let normalKnobWidth = frame.size.height - 2
@@ -440,8 +444,8 @@ import QuartzCore
                 self.offImageView.alpha = 0
                 self.onLabel.alpha = 1.0
                 self.offLabel.alpha = 0
-            }, completion: { finished in
-                self.isAnimating = false
+                }, completion: { finished in
+                    self.isAnimating = false
             })
         }
         else {
@@ -491,8 +495,8 @@ import QuartzCore
                 self.onLabel.alpha = 0
                 self.offLabel.alpha = 1.0
                 
-            }, completion: { finished in
-                self.isAnimating = false
+                }, completion: { finished in
+                    self.isAnimating = false
             })
         }
         else {
